@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Innovation Portal - Search to Scale Framework</title>
+    <style>
+        /* ============================================
+           EASY EDIT SECTION - UPDATE YOUR PROJECTS HERE
+           ============================================
+           
+           To update quarterly:
+           1. Find a project in the JavaScript section below
+           2. Change the values in quotes
+           3. Save the file
+           4. Open in browser and screenshot
+           
+           Example format:
+           {name: "Project Name", maturity: 1, value: 10, resources: 3, owner: "Name"},
+           
+           Maturity: 1=Search, 3=Experiment, 6=Execute, 10=Scale
+           Value: 1=Low, 3=Medium-Low, 6=Medium-High, 10=High
+           Resources: 1=Low, 2=Medium, 3=High
+        */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5vh 1.5vw;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 1.5vh;
+        }
+        
+        .header h1 {
+            color: #1a1d3a;
+            font-size: 2.2vw;
+            font-weight: 700;
+            margin-bottom: 0.3vh;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 0.95vw;
+        }
+        
+        .framework {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 6vw repeat(4, 1fr);
+            grid-template-rows: 7vh repeat(4, 1fr);
+            gap: 0.8vw;
+            min-height: 0;
+        }
+        
+        /* Axis Labels */
+        .y-axis-label {
+            grid-column: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85vw;
+            color: #1a1d3a;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            padding: 0.5vw;
+            text-align: center;
+        }
+        
+        .x-axis-label {
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.95vw;
+            color: white;
+            border-radius: 8px;
+            padding: 0.5vw;
+            text-align: center;
+        }
+        
+        .corner {
+            grid-column: 1;
+            grid-row: 1;
+            background: transparent;
+        }
+        
+        /* Maturity stage colors using brand palette */
+        .search { background: #EF5A2A; } /* Bright red/orange */
+        .experiment { background: #F18F3E; } /* Orange */
+        .execute { background: #2F79BD; } /* Blue */
+        .scale { background: #1a1d3a; } /* Dark navy */
+        
+        /* Grid cells */
+        .cell {
+            background: white;
+            border-radius: 12px;
+            padding: 0.5vw;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(8vw, 1fr));
+            gap: 0.2vw;
+            align-content: start;
+            position: relative;
+            min-height: 0;
+        }
+        
+        /* Zone highlighting */
+        .cell.ideal {
+            border: 3px solid #1a1d3a;
+            box-shadow: 0 0 0 3px rgba(26, 29, 58, 0.2), 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .cell.problem {
+            border: 3px solid #EF5A2A;
+            box-shadow: 0 0 0 3px rgba(239, 90, 42, 0.2), 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .cell.target {
+            border: 3px solid #2F79BD;
+            box-shadow: 0 0 0 3px rgba(47, 121, 189, 0.2), 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Project cards */
+        .project-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 3px solid #2F79BD;
+            border-radius: 4px;
+            padding: 0.3vw 0.4vw;
+            font-size: 0.65vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.3vw;
+        }
+        
+        .project-name {
+            font-weight: 600;
+            color: #1a1d3a;
+            line-height: 1.2;
+            flex: 1;
+        }
+        
+        .project-resources {
+            color: #EF5A2A;
+            font-weight: 600;
+            font-size: 0.6vw;
+            white-space: nowrap;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 1.5vh;
+            right: 1.5vw;
+            background: white;
+            padding: 0.8vw 1vw;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 0.63vw;
+        }
+        
+        .legend-title {
+            font-weight: 700;
+            margin-bottom: 0.4vw;
+            color: #1a1d3a;
+        }
+        
+        .legend-item {
+            margin: 0.2vw 0;
+            color: #666;
+        }
+        
+        /* Zone badges */
+        .zone-badge {
+            position: absolute;
+            top: 0.4vw;
+            right: 0.4vw;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.2vw 0.4vw;
+            border-radius: 4px;
+            font-size: 0.52vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .zone-badge.ideal { background: #1a1d3a; }
+        .zone-badge.problem { background: #EF5A2A; }
+        .zone-badge.target { background: #2F79BD; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Innovation Portal - Search to Scale Framework</h1>
+        <p>Project Portfolio Analysis | Maturity × Value × Resources</p>
+    </div>
+    
+    <div class="framework" id="framework">
+        <!-- Corner -->
+        <div class="corner"></div>
+        
+        <!-- X-axis labels (Maturity) -->
+        <div class="x-axis-label search">SEARCH</div>
+        <div class="x-axis-label experiment">EXPERIMENT</div>
+        <div class="x-axis-label execute">EXECUTE</div>
+        <div class="x-axis-label scale">SCALE</div>
+        
+        <!-- Y-axis labels (Value) -->
+        <div class="y-axis-label" style="grid-row: 2;">High Value</div>
+        <div class="y-axis-label" style="grid-row: 3;">Medium-High Value</div>
+        <div class="y-axis-label" style="grid-row: 4;">Medium-Low Value</div>
+        <div class="y-axis-label" style="grid-row: 5;">Low Value</div>
+        
+        <!-- Grid cells will be populated by JavaScript -->
+    </div>
+    
+    <div class="legend">
+        <div class="legend-title">Resources/Time</div>
+        <div class="legend-item">⏰ = Low</div>
+        <div class="legend-item">⏰⏰ = Medium</div>
+        <div class="legend-item">⏰⏰⏰ = High</div>
+    </div>
+
+    <script>
+        // ============================================
+        // EDIT YOUR PROJECTS HERE
+        // ============================================
+        const projects = [
+            {name: "Portal Podcasts", maturity: 1, value: 10, resources: 3, owner: "Nick"},
+            {name: "TechAcademy", maturity: 6, value: 6, resources: 2, owner: "Nick"},
+            {name: "PortalFund: RISE", maturity: 6, value: 6, resources: 2, owner: "Nick"},
+            {name: "MoneyFEST", maturity: 6, value: 10, resources: 2, owner: "Nick"},
+            {name: "gBETA Gulf Coast", maturity: 10, value: 10, resources: 1, owner: "Nick"},
+            {name: "We Run on EOS", maturity: 6, value: 3, resources: 2, owner: "Todd"},
+            {name: "Founder Meetup/FndrMob", maturity: 1, value: 10, resources: 1, owner: "Todd"},
+            {name: "Protolaunch", maturity: 1, value: 6, resources: 3, owner: "Braxton"},
+            {name: "Open Lab Nights", maturity: 3, value: 6, resources: 1, owner: "Braxton"},
+            {name: "Lab Workshops", maturity: 3, value: 6, resources: 1, owner: "Braxton"},
+            {name: "Pitchers & Prototypes", maturity: 1, value: 6, resources: 2, owner: "Braxton"},
+            {name: "RAMP", maturity: 6, value: 10, resources: 2, owner: "Todd"},
+            {name: "Launch Tank Mobile", maturity: 1, value: 10, resources: 3, owner: "Todd"},
+            {name: "Lab Mentoring & Member Usage", maturity: 3, value: 10, resources: 3, owner: "Braxton"},
+            {name: "Unlock AL", maturity: 3, value: 10, resources: 3, owner: "Paul"},
+            {name: "EiR Program", maturity: 3, value: 10, resources: 3, owner: "Paul"},
+            {name: "Research Fellowship", maturity: 3, value: 10, resources: 3, owner: "Paul"},
+            {name: "Internal: Project Intake & Management", maturity: 6, value: 10, resources: 2, owner: "Ann"},
+            {name: "Space Force Task Force - Revitalize the Space", maturity: 6, value: 10, resources: 2, owner: "Alex"},
+            {name: "Intro to AI Workshop", maturity: 6, value: 10, resources: 2, owner: "Nick"},
+            {name: "Truist Series", maturity: 3, value: 6, resources: 1, owner: "Nick"},
+            {name: "Social Media/Marketing", maturity: 3, value: 10, resources: 2, owner: "Todd"},
+            {name: "Newsletter", maturity: 6, value: 10, resources: 2, owner: "Todd"},
+            {name: "Replacement of 90 Software", maturity: 3, value: 6, resources: 2, owner: "Ann"},
+            {name: "City of Mobile Council of Innovation Framework", maturity: 1, value: 10, resources: 3, owner: "Todd"},
+            {name: "Create & Implement CRM", maturity: 1, value: 6, resources: 2, owner: "Jahdia"},
+            {name: "Monthly Financial Close", maturity: 6, value: 10, resources: 3, owner: "Jahdia"},
+            {name: "Corporate Strategy Workshopification", maturity: 1, value: 6, resources: 3, owner: "Todd"},
+            {name: "Innovation Days at X Organization", maturity: 1, value: 6, resources: 3, owner: "Todd"},
+            {name: "Sandbox Sessions", maturity: 1, value: 6, resources: 2, owner: "Todd"},
+            {name: "Innovation Circles", maturity: 1, value: 6, resources: 2, owner: "Todd"},
+            {name: "Space Force Task Force - Member Engagement", maturity: 3, value: 10, resources: 2, owner: "Alex"}
+        ];
+        
+        // ============================================
+        // DO NOT EDIT BELOW THIS LINE
+        // (unless you know JavaScript)
+        // ============================================
+        
+        const maturityMap = {1: 0, 3: 1, 6: 2, 10: 3};
+        const valueMap = {10: 0, 6: 1, 3: 2, 1: 3};
+        
+        const framework = document.getElementById('framework');
+        
+        // Create 16 cells (4x4 grid)
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.style.gridColumn = col + 2;
+                cell.style.gridRow = row + 2;
+                cell.dataset.maturity = [1, 3, 6, 10][col];
+                cell.dataset.value = [10, 6, 3, 1][row];
+                
+                // Add zone highlighting
+                const maturity = parseInt(cell.dataset.maturity);
+                const value = parseInt(cell.dataset.value);
+                
+                // Ideal state: High value + Execute or Scale
+                if (value === 10 && (maturity === 6 || maturity === 10)) {
+                    cell.classList.add('ideal');
+                }
+                
+                // Target: High or Medium-High value + Execute
+                if ((value === 10 || value === 6) && maturity === 6) {
+                    if (!cell.classList.contains('ideal')) {
+                        cell.classList.add('target');
+                    }
+                }
+                
+                // Problem: Low/Medium-Low value + Search phase + High resources
+                if ((value === 3 || value === 1) && maturity === 1) {
+                    cell.classList.add('problem');
+                }
+                
+                framework.appendChild(cell);
+            }
+        }
+        
+        // Populate cells with projects
+        projects.forEach(project => {
+            const maturityCol = maturityMap[project.maturity];
+            const valueRow = valueMap[project.value];
+            
+            const cells = framework.querySelectorAll('.cell');
+            const targetCell = Array.from(cells).find(cell => 
+                parseInt(cell.dataset.maturity) === project.maturity &&
+                parseInt(cell.dataset.value) === project.value
+            );
+            
+            if (targetCell) {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                
+                const resourceIcons = '⏰'.repeat(project.resources);
+                
+                card.innerHTML = `
+                    <div class="project-name">${project.name}</div>
+                    <span class="project-resources">${resourceIcons}</span>
+                `;
+                
+                targetCell.appendChild(card);
+            }
+        });
+    </script>
+</body>
+</html>

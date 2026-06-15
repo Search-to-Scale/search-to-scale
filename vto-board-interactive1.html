@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovation Portal - Mission to BHAG | FY26 Q4</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .board-container { background: white; border: 3px solid #000; overflow-x: auto; }
+        .board { display: grid; grid-template-columns: 160px repeat(7, 1fr); min-width: 1800px; }
+        .header-cell { background: #171832; color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 18px; border: 2px solid #000; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .header-cell.empty { background: white; }
+        .cell { border: 2px solid #ccc; padding: 10px; min-height: 200px; background: #fafafa; position: relative; }
+        .lane-label { background: #d74022; color: white; padding: 20px; font-weight: bold; font-size: 15px; border: 2px solid #000; display: flex; align-items: center; justify-content: center; text-align: center; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
+        .card { background: linear-gradient(135deg, #00579b 0%, #171832 100%); border: 3px solid #000; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: move; color: white; }
+        .card.dragging { opacity: 0.5; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .card-title { font-size: 15px; font-weight: bold; flex: 1; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; }
+        .status-on-track { background: #00C851; color: white; }
+        .status-off-track { background: #d84327; color: white; }
+        .status-complete { background: #171832; color: white; border: 2px solid white; }
+        .status-move-to-todos { background: #ffbb33; color: #000; }
+        .status-roll-forward { background: #bcc6e1; color: #000; }
+        .status-cancelled { background: #888; color: white; }
+        .add-card-btn { background: #d74022; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 8px; }
+        .add-card-btn:hover { background: #cc4e0f; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { color: #171832; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #171832; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 2px solid #bcc6e1; border-radius: 4px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #00579b; color: white; }
+        .btn-delete { background: #d84327; color: white; }
+        .btn-cancel { background: #ccc; color: #000; }
+        .cell.drag-over { background: #e3f2fd; }
+        .toolbar { background: #171832; padding: 15px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; border-radius: 8px; }
+        .toolbar h1 { color: white; flex: 1; margin: 0; font-size: 22px; }
+        .toolbar-btn { background: #d74022; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .toolbar-btn:hover { background: #cc4e0f; }
+        .toolbar-btn.secondary { background: #00579b; }
+        .toolbar-btn.secondary:hover { background: #004578; }
+        #importFile { display: none; }
+        @media print {
+            @page { size: landscape; margin: 0.5in; }
+            body { background: white; padding: 0; margin: 0; }
+            .toolbar { display: none !important; }
+            .add-card-btn { display: none !important; }
+            .board-container { border: none; overflow: visible; }
+            .board { min-width: 100%; font-size: 10px; }
+            .header-cell { padding: 8px; font-size: 11px; min-height: 40px; }
+            .lane-label { padding: 8px; font-size: 10px; }
+            .cell { min-height: 120px; page-break-inside: avoid; }
+            .card { page-break-inside: avoid; margin-bottom: 6px; padding: 8px; }
+            .card-title { font-size: 11px; }
+            .status-badge { font-size: 9px; padding: 2px 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <h1>Innovation Portal — Mission to BHAG &nbsp;|&nbsp; FY26 Q4</h1>
+        <button class="toolbar-btn" onclick="exportToPDF()">📄 Export PDF</button>
+        <button class="toolbar-btn secondary" onclick="exportData()">💾 Export Data</button>
+        <button class="toolbar-btn secondary" onclick="document.getElementById('importFile').click()">📂 Import Data</button>
+        <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    </div>
+
+    <div class="board-container">
+        <div class="board" id="board">
+            <!-- Headers -->
+            <div class="header-cell empty"></div>
+            <div class="header-cell">Q1 ROCKS</div>
+            <div class="header-cell">Q2 ROCKS</div>
+            <div class="header-cell">Q3 ROCKS</div>
+            <div class="header-cell">Q4 ROCKS</div>
+            <div class="header-cell">1-YEAR GOALS</div>
+            <div class="header-cell">3-YEAR PICTURE</div>
+            <div class="header-cell">BHAG</div>
+
+            <!-- Lane 1: Industry 4.0 -->
+            <div class="lane-label">Industry 4.0</div>
+            <div class="cell" data-lane="1" data-col="q1"></div>
+            <div class="cell" data-lane="1" data-col="q2"></div>
+            <div class="cell" data-lane="1" data-col="q3"></div>
+            <div class="cell" data-lane="1" data-col="q4"></div>
+            <div class="cell" data-lane="1" data-col="1year"></div>
+            <div class="cell" data-lane="1" data-col="3year"></div>
+            <div class="cell" data-lane="1" data-col="bhag"></div>
+
+            <!-- Lane 2: Scale Programs -->
+            <div class="lane-label">Scale Programs</div>
+            <div class="cell" data-lane="2" data-col="q1"></div>
+            <div class="cell" data-lane="2" data-col="q2"></div>
+            <div class="cell" data-lane="2" data-col="q3"></div>
+            <div class="cell" data-lane="2" data-col="q4"></div>
+            <div class="cell" data-lane="2" data-col="1year"></div>
+            <div class="cell" data-lane="2" data-col="3year"></div>
+            <div class="cell" data-lane="2" data-col="bhag"></div>
+
+            <!-- Lane 3: $1M+ Funding -->
+            <div class="lane-label">$1M+ Funding</div>
+            <div class="cell" data-lane="3" data-col="q1"></div>
+            <div class="cell" data-lane="3" data-col="q2"></div>
+            <div class="cell" data-lane="3" data-col="q3"></div>
+            <div class="cell" data-lane="3" data-col="q4"></div>
+            <div class="cell" data-lane="3" data-col="1year"></div>
+            <div class="cell" data-lane="3" data-col="3year"></div>
+            <div class="cell" data-lane="3" data-col="bhag"></div>
+
+            <!-- Lane 4: Best in Class Ops -->
+            <div class="lane-label">Best in Class Ops</div>
+            <div class="cell" data-lane="4" data-col="q1"></div>
+            <div class="cell" data-lane="4" data-col="q2"></div>
+            <div class="cell" data-lane="4" data-col="q3"></div>
+            <div class="cell" data-lane="4" data-col="q4"></div>
+            <div class="cell" data-lane="4" data-col="1year"></div>
+            <div class="cell" data-lane="4" data-col="3year"></div>
+            <div class="cell" data-lane="4" data-col="bhag"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Edit Card</h2>
+            <form id="cardForm">
+                <input type="hidden" id="cardId">
+                <input type="hidden" id="cardLane">
+                <input type="hidden" id="cardCol">
+                <div class="form-group">
+                    <label>Title / Rock Name:</label>
+                    <input type="text" id="cardTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="cardStatus">
+                        <option value="on-track">On Track</option>
+                        <option value="off-track">Off Track</option>
+                        <option value="complete">Complete</option>
+                        <option value="move-to-todos">Move to To Dos</option>
+                        <option value="roll-forward">Roll Forward</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Done Looks Like:</label>
+                    <textarea id="cardDone"></textarea>
+                </div>
+                <div class="form-group" id="workedGroup" style="display:none;">
+                    <label>What Worked:</label>
+                    <textarea id="cardWorked"></textarea>
+                </div>
+                <div class="form-group" id="didntGroup" style="display:none;">
+                    <label>What Didn't:</label>
+                    <textarea id="cardDidnt"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-delete" id="deleteBtn">Delete</button>
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Show worked/didn't for any past quarter, not just Q1
+        const pastQuarters = ['q1','q2','q3'];
+
+        let boardData = JSON.parse(localStorage.getItem('vtoBoardQ4') || '{}');
+
+        // ── PRE-POPULATE DEFAULT DATA ─────────────────────────────────────────
+
+        const defaults = {
+            // LANE 1: Industry 4.0
+            '1-q1': [],
+            '1-q2': [
+                { title: 'Industry 4.0 Council', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Manage Buildout of AI Fluency Workshop', status: 'off-track', done: '', worked: '', didnt: '' }
+            ],
+            '1-q3': [],
+            '1-1year': [{ title: 'Industry 4.0 Planning', status: 'on-track', done: 'Establish City of Mobile Council of Innovation (advisory/planning group of influential stakeholders to begin planning the Industry 4.0 Center of Excellence).', worked: '', didnt: '' }],
+            '1-3year': [{ title: 'Progress towards Industry 4.0 Center of Excellence', status: 'on-track', done: 'Establish Industry 4.0 consortium (evolution of Year 1 Council) with industry, university, and government partners to develop capabilities and plan the Center of Excellence.', worked: '', didnt: '' }],
+            '1-bhag': [{ title: 'Physical Industry 4.0 Center of Excellence', status: 'on-track', done: '', worked: '', didnt: '' }],
+
+            // LANE 2: Scale Programs
+            '2-q1': [
+                { title: 'Build 1:Many Scaffolding: Project Plan', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: '1:Few Scale Plan', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Onboard 4 Lab Ambassadors', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '2-q2': [
+                { title: 'Get PFR to Scale', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Get Lab Events to Scale', status: 'off-track', done: '', worked: '', didnt: '' }
+            ],
+            '2-q3': [
+                { title: 'Package TechAcademy for Distribution', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Create 2 Public Lab Presentations and Present to 2 Groups', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Establish and Execute Podcast Reservation System', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '2-1year': [{ title: 'Program Maturity', status: 'on-track', done: 'Reach "Scale" for high-value 1-to-Few offerings (TechAcademy, PFR, Alumni Groups, Mastermind Groups, FounderMob). Reach "Execute" in 1-to-Many offerings and 1-to-1 offerings.', worked: '', didnt: '' }],
+            '2-3year': [{ title: 'Program Maturity & Scale', status: 'on-track', done: 'Reach "Scale" across all program delivery models: 1-to-Many, 1-to-Few, and 1-to-1 (clearly defined, efficiently operating, best-in-class).', worked: '', didnt: '' }, { title: 'Regional Content Distribution', status: 'on-track', done: 'Launch content distribution with at least one partner organization using train-the-trainer model.', worked: '', didnt: '' }],
+            '2-bhag': [{ title: 'Scale Impact Through Partners & Digital Content', status: 'on-track', done: '', worked: '', didnt: '' }],
+
+            // LANE 3: $1M+ Funding
+            '3-q1': [
+                { title: 'Newsletter Restart', status: 'complete', done: '', worked: '', didnt: '' }
+            ],
+            '3-q2': [
+                { title: 'Marketing & Social Media Strategy Implementation', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '3-q3': [
+                { title: 'Document Loan Fund Framework', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '3-1year': [{ title: 'Establish and Activate EiR', status: 'on-track', done: 'Launch Entrepreneur-in-Residence (EiR) program.', worked: '', didnt: '' }, { title: 'Marketing & Communications', status: 'on-track', done: 'Level up marketing (effective social media, storytelling, audience reach beyond current website refresh).', worked: '', didnt: '' }],
+            '3-3year': [{ title: 'Funding Network', status: 'on-track', done: 'Connect entrepreneurs to $450K+ annually in external funding through our network of lenders, grant programs, and sponsors.', worked: '', didnt: '' }],
+            '3-bhag': [{ title: '$1M+ Annually in External Funding Connected', status: 'on-track', done: '', worked: '', didnt: '' }],
+
+            // LANE 4: Best in Class Ops
+            '4-q1': [
+                { title: 'Admin Point of Contact Transition', status: 'complete', done: '', worked: '', didnt: '' },
+                { title: 'Implement CRM Solution', status: 'off-track', done: '', worked: '', didnt: '' },
+                { title: 'Review and Update 6 Processes', status: 'complete', done: '', worked: '', didnt: '' },
+                { title: 'Mini-Challenge Program Development', status: 'off-track', done: '', worked: '', didnt: '' },
+                { title: 'Hire for Challenge Project', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '4-q2': [
+                { title: 'Finalize EOS Software Solution', status: 'complete', done: '', worked: '', didnt: '' },
+                { title: 'CRM Optimization', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Build Unlock AL Platform', status: 'off-track', done: '', worked: '', didnt: '' },
+                { title: 'Liven Up / Beautify the Space', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Update Mail Process', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '4-q3': [
+                { title: 'Create Annual Report', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Execute Unlock AL', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Create Board-Ready 3-Year Fund Development Playbook', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Develop IP\'s Yes/No Decision Framework', status: 'on-track', done: '', worked: '', didnt: '' },
+                { title: 'Establish KPIs', status: 'on-track', done: '', worked: '', didnt: '' }
+            ],
+            '4-1year': [{ title: 'Staff Capacity & Focus', status: 'on-track', done: 'Ensure staff has time to think and plan, with individuals maxed at 1 item per Search-to-Scale left column.', worked: '', didnt: '' }, { title: 'Implement and Use CRM', status: 'on-track', done: 'Implement CRM for tracking, decision-making, fundraising coordination, and reporting.', worked: '', didnt: '' }, { title: 'Revitalize Space', status: 'on-track', done: 'Revitalize space (activate through member socials, main space events/working, refresh with paint/art).', worked: '', didnt: '' }],
+            '4-3year': [],
+            '4-bhag': [{ title: 'Best-in-Class Operations & Continuous Improvement', status: 'on-track', done: '', worked: '', didnt: '' }]
+        };
+
+        // Only set defaults for keys not already in boardData
+        Object.keys(defaults).forEach(key => {
+            if (!boardData[key]) boardData[key] = defaults[key];
+        });
+
+        let currentCardId = null;
+
+        function initBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const lane = cell.dataset.lane;
+                const col = cell.dataset.col;
+                const cellKey = `${lane}-${col}`;
+
+                if (boardData[cellKey]) {
+                    boardData[cellKey].forEach((cardData, index) => {
+                        createCard(cell, cardData, `${cellKey}-${index}`);
+                    });
+                }
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'add-card-btn';
+                addBtn.textContent = '+ Add Card';
+                addBtn.onclick = () => openNewCardModal(lane, col);
+                cell.appendChild(addBtn);
+
+                cell.addEventListener('dragover', handleDragOver);
+                cell.addEventListener('drop', handleDrop);
+                cell.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function createCard(container, data, id) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.draggable = true;
+            card.dataset.id = id;
+
+            const statusClass = `status-${data.status}`;
+            const statusText = data.status.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-title">${data.title}</div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => openEditModal(id, data));
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+
+            container.insertBefore(card, container.querySelector('.add-card-btn'));
+            return card;
+        }
+
+        function showRetroFields(col) {
+            const show = pastQuarters.includes(col);
+            document.getElementById('workedGroup').style.display = show ? 'block' : 'none';
+            document.getElementById('didntGroup').style.display = show ? 'block' : 'none';
+        }
+
+        function openNewCardModal(lane, col) {
+            currentCardId = null;
+            document.getElementById('modalTitle').textContent = 'New Card';
+            document.getElementById('cardForm').reset();
+            document.getElementById('cardLane').value = lane;
+            document.getElementById('cardCol').value = col;
+            document.getElementById('deleteBtn').style.display = 'none';
+            showRetroFields(col);
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function openEditModal(id, data) {
+            currentCardId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Card';
+            document.getElementById('cardId').value = id;
+            document.getElementById('cardTitle').value = data.title;
+            document.getElementById('cardStatus').value = data.status;
+            document.getElementById('cardDone').value = data.done || '';
+            document.getElementById('cardWorked').value = data.worked || '';
+            document.getElementById('cardDidnt').value = data.didnt || '';
+            document.getElementById('deleteBtn').style.display = 'block';
+            const parts = id.split('-');
+            showRetroFields(parts[1]);
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        document.getElementById('cardForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = {
+                title: document.getElementById('cardTitle').value,
+                status: document.getElementById('cardStatus').value,
+                done: document.getElementById('cardDone').value,
+                worked: document.getElementById('cardWorked').value,
+                didnt: document.getElementById('cardDidnt').value
+            };
+
+            if (currentCardId) {
+                const parts = currentCardId.split('-');
+                const index = parts[2];
+                const cellKey = `${parts[0]}-${parts[1]}`;
+                boardData[cellKey][index] = formData;
+                const card = document.querySelector(`[data-id="${currentCardId}"]`);
+                const statusClass = `status-${formData.status}`;
+                const statusText = formData.status.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                card.querySelector('.card-title').textContent = formData.title;
+                card.querySelector('.status-badge').className = `status-badge ${statusClass}`;
+                card.querySelector('.status-badge').textContent = statusText;
+            } else {
+                const lane = document.getElementById('cardLane').value;
+                const col = document.getElementById('cardCol').value;
+                const cellKey = `${lane}-${col}`;
+                if (!boardData[cellKey]) boardData[cellKey] = [];
+                boardData[cellKey].push(formData);
+                const cell = document.querySelector(`[data-lane="${lane}"][data-col="${col}"]`);
+                const newId = `${cellKey}-${boardData[cellKey].length - 1}`;
+                createCard(cell, formData, newId);
+            }
+
+            saveData();
+            closeModal();
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            if (!currentCardId) return;
+            if (confirm('Delete this card?')) {
+                const parts = currentCardId.split('-');
+                const index = parts[2];
+                const cellKey = `${parts[0]}-${parts[1]}`;
+                boardData[cellKey].splice(index, 1);
+                document.querySelector(`[data-id="${currentCardId}"]`).remove();
+                saveData();
+                closeModal();
+                location.reload();
+            }
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+        let draggedCard = null;
+        function handleDragStart(e) { draggedCard = e.target; e.target.classList.add('dragging'); }
+        function handleDragEnd(e) { e.target.classList.remove('dragging'); }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            if (!draggedCard) return;
+            const oldId = draggedCard.dataset.id;
+            const parts = oldId.split('-');
+            const oldCellKey = `${parts[0]}-${parts[1]}`;
+            const oldIndex = parts[2];
+            const newLane = e.currentTarget.dataset.lane;
+            const newCol = e.currentTarget.dataset.col;
+            const newCellKey = `${newLane}-${newCol}`;
+            const cardData = boardData[oldCellKey][oldIndex];
+            boardData[oldCellKey].splice(oldIndex, 1);
+            if (!boardData[newCellKey]) boardData[newCellKey] = [];
+            boardData[newCellKey].push(cardData);
+            saveData();
+            location.reload();
+        }
+
+        function saveData() { localStorage.setItem('vtoBoardQ4', JSON.stringify(boardData)); }
+
+        function exportData() {
+            const dataStr = JSON.stringify(boardData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `vto-board-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    boardData = JSON.parse(e.target.result);
+                    saveData();
+                    alert('Data imported! Reloading...');
+                    location.reload();
+                } catch (error) {
+                    alert('Error importing data. Check the file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportToPDF() {
+            document.querySelectorAll('.add-card-btn').forEach(b => b.style.display = 'none');
+            document.querySelector('.toolbar').style.display = 'none';
+            window.print();
+            setTimeout(() => {
+                document.querySelectorAll('.add-card-btn').forEach(b => b.style.display = 'block');
+                document.querySelector('.toolbar').style.display = 'flex';
+            }, 1000);
+        }
+
+        initBoard();
+    </script>
+</body>
+</html>

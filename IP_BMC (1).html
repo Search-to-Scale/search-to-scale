@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Innovation Portal — Business Model Canvas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#f5f4f0;color:#171832}
+body{padding:16px;display:flex;flex-direction:column}
+header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;flex-shrink:0}
+header h1{font-size:16px;font-weight:700;color:#171832}
+header p{font-size:11px;color:#999}
+.grid{display:grid;grid-template-columns:1.1fr 1fr 1.2fr 1fr 1.1fr;grid-template-rows:1fr 1fr 160px;gap:8px;flex:1;min-height:0}
+.b{background:#fff;border:1px solid #c8c8be;border-radius:8px;padding:11px 13px;overflow:hidden;position:relative}
+.b.tall{grid-row:span 2}
+.b.wide{grid-column:span 2}
+.b.vp{border-left:3px solid #D74022}
+.b.cs{border-right:3px solid #171832}
+.lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#bbb;margin-bottom:8px}
+ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+ul.row{flex-direction:row;flex-wrap:wrap;column-gap:24px;row-gap:6px}
+li{font-size:14px;line-height:1.4;padding-left:14px;position:relative;cursor:default;color:#2a2a3a}
+li::before{content:'';position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:#ddd}
+li:hover::before{background:#D74022}
+li:hover{color:#171832}
+.tip{display:none;position:fixed;z-index:999;background:#fff;border:1px solid #ddd;border-radius:8px;padding:9px 12px;font-size:11.5px;color:#555;line-height:1.5;width:230px;box-shadow:0 4px 20px rgba(0,0,0,.12);pointer-events:none}
+.mid{display:flex;flex-direction:column;gap:8px}
+.mid .b{flex:1}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Innovation Portal &mdash; Business Model Canvas</h1>
+  <p>Hover any item for detail &nbsp;&middot;&nbsp; Draft June 2026</p>
+</header>
+
+<div class="grid">
+
+<div class="b tall">
+  <div class="lbl">Key Partnerships</div>
+  <ul>
+    <li data-tip="Primary funder — tax credit program, largest single source of restricted revenue">Innovate Alabama</li>
+    <li data-tip="Annual funding and civic support">City and county</li>
+    <li data-tip="Program-specific sponsorships and foundation grants (e.g. Regions Foundation)">Corporate sponsors</li>
+    <li data-tip="gBETA / gener8tor and Builders and Backers — national program partners bringing external credibility and investment pipeline">3rd party program providers</li>
+    <li data-tip="Pipeline partnerships — cohort programs, internships, speaking engagements">Colleges and universities</li>
+    <li data-tip="Volunteer and compensated mentors, speakers, and subject matter experts">Mentors and SMEs</li>
+    <li data-tip="Capital for founders — essential to the promise of connecting entrepreneurs to $1M+ annually">Investors and funders</li>
+    <li data-tip="Wilkins Miller (accounting/CPA), Insperity (HR/PEO), Fortif and Adams IP (legal counsel)">Professional services</li>
+    <li data-tip="Third-party marketing support">Outsourced marketing</li>
+  </ul>
+</div>
+
+<div class="mid">
+  <div class="b">
+    <div class="lbl">Key Activities</div>
+    <ul>
+      <li data-tip="Curriculum development, cohort management, facilitation, program evaluation">Design and deliver programs</li>
+      <li data-tip="Matching, SME engagement, advisor relationships">Recruit and manage mentors</li>
+      <li data-tip="Facilities management, member experience, event coordination">Operate the space</li>
+      <li data-tip="Partner development, corporate outreach, civic and government engagement">Build ecosystem relationships</li>
+      <li data-tip="Grant writing, funder relationships, compliance reporting, funding vehicle management">Fundraise and manage grants</li>
+      <li data-tip="Recruiting, onboarding, performance management, culture">Hire and develop staff</li>
+      <li data-tip="Venture stage tracking, KPIs, program impact reporting">Measure outcomes</li>
+      <li data-tip="Social media, newsletter, press, events, brand management">Market and communicate</li>
+    </ul>
+  </div>
+  <div class="b">
+    <div class="lbl">Key Resources</div>
+    <ul>
+      <li data-tip="Program delivery, facilitation, curriculum expertise, admin">Staff and contractors</li>
+      <li data-tip="Volunteers and compensated advisors across industries">Mentor and advisor network</li>
+      <li data-tip="Coworking, event space, prototyping lab, podcast studio">Physical space</li>
+      <li data-tip="Curriculum, facilitator guides, participant materials, nascent LMS infrastructure">Program content and LMS</li>
+      <li data-tip="Pilot Fund ($250K), PRI Loan Fund (in development), funding network">Access to capital</li>
+      <li data-tip="Recognized go-to hub for entrepreneurship in Mobile — hardest to replicate asset">Brand and reputation</li>
+      <li data-tip="CRM, Monday.com, financial systems, software subscriptions">Technology infrastructure</li>
+      <li data-tip="Partners, funders, government, corporate, university relationships">Ecosystem connections</li>
+      <li data-tip="Oversight, credibility, and strategic guidance">Board and governance</li>
+    </ul>
+  </div>
+</div>
+
+<div class="b tall vp">
+  <div class="lbl">Value Proposition</div>
+  <ul>
+    <li data-tip="You don't have to leave to build something real. The resources, community, and ecosystem are here.">Entrepreneurship is viable in Mobile</li>
+    <li data-tip="Workspace, mentorship, funding connections, and expertise that didn't exist before IP">Fill infrastructure gaps</li>
+    <li data-tip="Channeling innovation toward Mobile's strengths in aerospace, maritime, and advanced manufacturing">Unlock regional potential</li>
+    <li data-tip="Creating connection and collaboration where fragmentation used to be the norm">Catalyze ecosystem density</li>
+    <li data-tip="Practical tools for financial literacy, tech adoption, and process standardization. Useful and applicable right now.">Run better (established)</li>
+    <li data-tip="Validation, mentorship, investor connections, and a local ecosystem that makes leaving Mobile unnecessary">Path from idea to traction</li>
+    <li data-tip="Entrepreneurial thinking and facilitation expertise outside their own walls">Think like a builder (corporate)</li>
+    <li data-tip="Real exposure to entrepreneurship before committing — making the path accessible for future builders">Make it feel possible</li>
+  </ul>
+</div>
+
+<div class="mid">
+  <div class="b">
+    <div class="lbl">Customer Relationships</div>
+    <ul>
+      <li data-tip="Relationships don't end at graduation — they deepen over time. Not transactional.">Long-term, community-based</li>
+      <li data-tip="Share your story, invest your time and talent, help build the next generation. Don't just use what we've built and ride off.">Pour back in</li>
+    </ul>
+  </div>
+  <div class="b">
+    <div class="lbl">Channels</div>
+    <ul>
+      <li data-tip="Coworking, event space, conference rooms, prototyping lab, podcast studio">Physical space</li>
+      <li data-tip="TechAcademy, Portal Fund: RISE, gBETA, Builders and Backers, Unlock Alabama">Cohort programs</li>
+      <li data-tip="RAMP — ongoing founder-mentor matching and monthly touchpoints">Mentorship</li>
+      <li data-tip="Entrepreneur in Residence program and Research Cohort Fellows">EiR</li>
+      <li data-tip="MoneyFest, Open Lab Nights, Intro to AI, community events">Workshops and events</li>
+      <li data-tip="Corporate retreats, strategic planning, college speaking, community presentations">Speaking and facilitation</li>
+      <li data-tip="Podcast (launching Q4), digital curriculum, evergreen content — supports regional distribution goal">Online content</li>
+    </ul>
+  </div>
+</div>
+
+<div class="b tall cs">
+  <div class="lbl">Customer Segments</div>
+  <ul>
+    <li data-tip="Main Street businesses and organizations — the largest current segment. Seeking practical tools, knowledge, and community to run better.">Established businesses and orgs</li>
+    <li data-tip="Startups and scalable ventures building for growth, investment, and regional impact">Emerging ventures</li>
+    <li data-tip="Established organizations building entrepreneurial thinking or internal innovation capacity">Corporate innovators</li>
+    <li data-tip="Students, career changers, and anyone who hasn't started yet but might — the pipeline for everything else">Future builders</li>
+  </ul>
+</div>
+
+<div class="b wide">
+  <div class="lbl">Cost Structure</div>
+  <ul class="row">
+    <li data-tip="Largest cost — staff salaries, benefits, contractor fees">Personnel</li>
+    <li data-tip="Property taxes, utilities, maintenance, safety compliance, upkeep, furniture, office supplies">Facility</li>
+    <li data-tip="Contractor facilitators, speaker fees, food, materials, books, A/V, event supplies, printed materials">Program delivery</li>
+    <li data-tip="Equipment, supplies, and consumables">Lab and podcast studio</li>
+    <li data-tip="Food, beverages, and supplies for membership and community">Member experience</li>
+    <li data-tip="CRM, LMS, Monday.com, software subscriptions">Technology</li>
+    <li data-tip="Outsourced marketing, advertising, press releases">Marketing and comms</li>
+    <li data-tip="Fortif, Adams IP, Wilkins Miller, Insperity">Professional services</li>
+  </ul>
+</div>
+
+<div class="b wide">
+  <div class="lbl">Revenue Streams</div>
+  <ul class="row">
+    <li data-tip="Day pass, community member, office commons — unrestricted">Membership tiers</li>
+    <li data-tip="e.g. bakery — unrestricted earned revenue">Leased tenants</li>
+    <li data-tip="Conference rooms, event space — unrestricted">Event and room rentals</li>
+    <li data-tip="Restricted — e.g. Regions Foundation, corporate partners">Program sponsorships</li>
+    <li data-tip="Restricted — Innovate Alabama tax credit (largest), other grants">Grants</li>
+    <li data-tip="Restricted — annual allocation">City and county funding</li>
+    <li data-tip="Nominal — unrestricted">Donations</li>
+  </ul>
+</div>
+
+</div>
+
+<div id="tip" class="tip"></div>
+
+<script>
+const tip = document.getElementById('tip');
+document.querySelectorAll('li[data-tip]').forEach(li => {
+  li.addEventListener('mouseenter', e => {
+    tip.textContent = li.dataset.tip;
+    tip.style.display = 'block';
+    position(e);
+  });
+  li.addEventListener('mousemove', position);
+  li.addEventListener('mouseleave', () => tip.style.display = 'none');
+});
+function position(e) {
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + 240 > window.innerWidth) x = e.clientX - 244;
+  if (y + 80 > window.innerHeight) y = e.clientY - 90;
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+</script>
+</body>
+</html>
